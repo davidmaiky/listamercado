@@ -15,6 +15,7 @@ Este repositório está pronto para deploy no EasyPanel usando Docker Compose.
 3. Aponte para este repositório.
 4. Use o arquivo `docker-compose.yml` da raiz do projeto.
 5. Faça o deploy.
+6. No serviço **frontend**, configure um domínio apontando para a porta `80`.
 
 ## Serviços
 
