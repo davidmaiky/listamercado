@@ -2,6 +2,34 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database');
 
+let clients = [];
+
+// SSE endpoint for real-time updates
+router.get('/events', (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
+
+    res.write('data: connected\n\n');
+
+    clients.push(res);
+
+    req.on('close', () => {
+        clients = clients.filter(client => client !== res);
+    });
+});
+
+function notifyClients() {
+    clients.forEach(client => {
+        try {
+            client.write('data: update\n\n');
+        } catch (err) {
+            console.error('Error sending SSE update:', err);
+        }
+    });
+}
+
 // Get all items
 router.get('/', (req, res) => {
     const sql = `
@@ -32,6 +60,7 @@ router.post('/', (req, res) => {
             res.status(400).json({ "error": err.message });
             return;
         }
+        notifyClients();
         res.json({
             "message": "success",
             "data": { id: this.lastID, ...req.body, purchased: 0 }
@@ -55,6 +84,7 @@ router.put('/:id', (req, res) => {
             res.status(400).json({ "error": err.message });
             return;
         }
+        notifyClients();
         res.json({
             "message": "success",
             "changes": this.changes
@@ -70,6 +100,7 @@ router.delete('/:id', (req, res) => {
             res.status(400).json({ "error": err.message });
             return;
         }
+        notifyClients();
         res.json({ "message": "deleted", changes: this.changes });
     });
 });
