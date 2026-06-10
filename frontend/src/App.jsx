@@ -12,10 +12,27 @@ function App() {
 
   useEffect(() => {
     loadData();
+
+    const API_URL = import.meta.env.VITE_API_URL || '/api';
+    const eventSource = new EventSource(`${API_URL}/items/events`);
+
+    eventSource.onmessage = (event) => {
+      if (event.data === 'update') {
+        loadData(false);
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("EventSource failed:", error);
+    };
+
+    return () => {
+      eventSource.close();
+    };
   }, []);
 
-  const loadData = async () => {
-    setLoading(true);
+  const loadData = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const [itemsData, categoriesData] = await Promise.all([
         getItems(),
@@ -26,7 +43,7 @@ function App() {
     } catch (error) {
       console.error("Failed to load data", error);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
