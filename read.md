@@ -112,9 +112,10 @@ docker compose down -v
 3. Conecte este repositório Git.
 4. Selecione o arquivo `docker-compose.yml` na raiz.
 5. Faça o deploy.
+6. No serviço **frontend**, configure um domínio apontando para a porta `80`.
 
 Após subir:
-- A aplicação web ficará disponível no domínio configurado para o serviço `frontend`.
+- A aplicação web ficará disponível no domínio configurado para o serviço `frontend` (porta `80`).
 - O backend ficará privado na rede interna, acessado pelo frontend em `/api`.
 
 ## 7) Verificação pós-instalação
