@@ -9,9 +9,8 @@ RUN npm run build
 # Stage 2: Build backend
 FROM node:22-alpine AS backend-build
 WORKDIR /app
-COPY backend/package*.json ./
-RUN npm ci --omit=dev
 COPY backend/ .
+RUN npm ci --omit=dev
 
 # Final stage: nginx (frontend) + Node.js (backend) via supervisord
 FROM nginx:1.29-alpine
